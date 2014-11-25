@@ -8,21 +8,22 @@ typedef struct path path;
 
 //------------- functions --------------------//
 struct graph* createGraph();
-int getSize(struct graph*);
+int getGraphSize(struct graph*);
 int insertVertex(struct graph*, int);
 void insertEdge(struct graph*, int, int, int);
 
 struct path* createPath(int);
+void startingPath(struct path*, int);
 
 void addPath(struct path*, int);
 void shiftPath(struct path*, int, int, int);
 void removePath(struct path*, int, int);
 
 int edgeWeight(struct edge*, int);
-int totalPathWeigth(struct graph*, struct path*);
+int totalPathWeight(struct graph*, struct path*);
 void tsp_backtracking(struct graph*, struct path*, struct path*, int* );
 
-void emptyMemory(struct graph*);
-void printGraph(struct graph*);
+void emptyMemoryGraph(struct graph*);
+void emptyMemoryPath(struct path*);
 
 #endif

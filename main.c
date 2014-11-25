@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "file.h"
 #include "graph.h"
 
-struct graph* buildGraph(){
+struct graph* buildGraph(char* input){
 	FILE* file;
 	char* token;
 	graph* ptGraph;
@@ -11,7 +12,7 @@ struct graph* buildGraph(){
 	int vertex1;
 	int vertex2;
 
-	if(!(file=fopen("./input","r"))){
+	if(!(file=fopen(input, "r"))){
 		printf("file error");
 		exit(1);
 	}
@@ -42,16 +43,39 @@ struct graph* buildGraph(){
 	return ptGraph;
 }
 
-int main(int argc, char** argv){
-	int bestLength = 999999;
-	graph* ptGraph = buildGraph();
-	path* ptPath = createPath(getSize(ptGraph));
-	path* ptBestPath = createPath(getSize(ptGraph));
+void isTherePath(struct path* ptBestPath, int bestLength, int maxLength){
+	if(bestLength < 999999 && bestLength <= maxLength){
+		printPath(ptBestPath);
+	}
+	else{
+		printf("impossivel\n");
+	}
+}
 
-	tsp_backtracking(ptGraph, ptPath, ptBestPath, &bestLength);
-	printPath(ptBestPath);
+int main(int argc, char** argv){
+	int maxLength, bestLength = 999999;
+	char input[15] = "./";
+
+	if(argc == 3){
+		strcpy(input,argv[1]);
+		maxLength = atoi(argv[2]);
+
+	}
+	else{
+		printf("./a.out <input> <maxWeight\n");
+		exit(1);
+	}
 	
-	printGraph(ptGraph);
-	emptyMemory(ptGraph);
+	graph* ptGraph = buildGraph(input);
+	path* ptPath = createPath(getGraphSize(ptGraph));
+	path* ptBestPath = createPath(getGraphSize(ptGraph));
+
+	startingPath(ptPath, 0);
+	tsp_backtracking(ptGraph, ptPath, ptBestPath, &bestLength);
+	isTherePath(ptBestPath, bestLength, maxLength);
+
+	emptyMemoryGraph(ptGraph);
+	emptyMemoryPath(ptPath);
+	emptyMemoryPath(ptBestPath);
 	return 0;
 }

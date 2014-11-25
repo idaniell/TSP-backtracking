@@ -9,7 +9,7 @@ struct vertex{
 
 struct edge{
 	int weight;
-	int accsses;
+	int access;
 	struct edge* next;
 };
 
@@ -24,18 +24,16 @@ struct path{
 	int usedLength;
 };
 
-
 //------------------------- Operations about the graph -------------------------//
 struct graph* createGraph(int nVertices){
 	struct graph* ptGraph;
-
 	ptGraph = (struct graph*)calloc(1,sizeof(struct graph));
 	ptGraph->vertexList = (struct vertex*)calloc(nVertices,sizeof(struct vertex));
 	ptGraph->numVertex = nVertices;
 	return ptGraph;
 }
 
-void emptyMemory(struct graph* ptGraph){
+void emptyMemoryGraph(struct graph* ptGraph){
 	int i;
 	struct edge *tmp, *aux;
 
@@ -51,11 +49,11 @@ void emptyMemory(struct graph* ptGraph){
 	free(ptGraph);
 }
 
-int getSize(struct graph* ptGraph){
+int getGraphSize(struct graph* ptGraph){
 	return ptGraph->numVertex;
 }
 
-//------------------------- Operations about the vertexs -------------------------//
+//-------------------------- Operations about the vertex ----------------------------//
 int insertVertex(struct graph* ptGraph, int elem){
 	(ptGraph->vertexList)[elem].element = elem;
 	return elem;
@@ -66,14 +64,14 @@ void insertEdge(struct graph* ptGraph, int destVertex, int origVertex, int weigh
 	struct edge* new;
 
 	new = (struct edge*)calloc(1,sizeof(struct edge));
-	(*new).accsses = destVertex;
+	(*new).access = destVertex;
 	new->weight = weight;
 	new->next = (ptGraph->vertexList)[origVertex].edgeList;
 	(ptGraph->vertexList)[origVertex].edgeList = new;
 
 	// undirected graph 
 	new=(struct edge*)calloc(1,sizeof(struct edge));
-	(*new).accsses = origVertex;
+	(*new).access = origVertex;
 	new->weight = weight;
 	new->next = (ptGraph->vertexList)[destVertex].edgeList;
 	(ptGraph->vertexList)[destVertex].edgeList = new;
@@ -95,31 +93,40 @@ struct path* createPath(int size){
 	return ptPath;
 }
 
+void startingPath(struct path* ptPath, int vertex){
+	(ptPath->elements)[0] = vertex;
+	(ptPath->usedLength)++;
+}
+
 void printPath(struct path* ptPath){
 	int i;
 
-	for(i=0; i < ptPath->usedLength; i++){
+	for(i=ptPath->usedLength-1; i > -1; i--){
 		printf("%d ", (ptPath->elements)[i]);
 	}
-	printf("\n\n");
+	printf("\n");
 }
 
+void emptyMemoryPath(struct path* ptPath){
+	free(ptPath->elements);
+	free(ptPath);
+}
 //----------------------------- Operations about the TSP ----------------------------//
 
 int edgeWeight(struct edge* ptEdge, int vertex){
 	struct edge* tmp = ptEdge;
 
-	while(tmp->accsses != vertex){
+	while(tmp->access != vertex){
 		tmp = tmp->next;
 	}
 	return tmp->weight;
 }
 
-int totalPathWeigth(struct graph* ptGraph, struct path* ptPath){
+int totalPathWeight(struct graph* ptGraph, struct path* ptPath){
 	int i, sum = 0;
 
 	for(i=1 ; i < ptPath->usedLength; i++){
-		sum += edgeWeight((ptGraph->vertexList)[(ptPath->elements)[i-1]].edgeList, (ptPath->elements)[i]);
+		sum += edgeWeight((ptGraph->vertexList)[(ptPath->elements)[i-1]].edgeList, (ptPath->elements)[i]); //Weight vertex source to destination vertex 
 	}
 	return sum;
 }
@@ -179,44 +186,28 @@ void copyArray(struct path* ptBestPath, struct path* ptPath){
 void tsp_backtracking(struct graph* ptGraph, struct path* ptPath, struct path* ptBestPath, int* bestLength){
 	
 	//if the path is longe than best (so far), quit!
-	if(totalPathWeigth(ptGraph, ptPath) > *bestLength){
+	if(totalPathWeight(ptGraph, ptPath) > *bestLength){
 		return;
 	}
 
 	//if the path is complete, quit!
-	else if(completePath(ptGraph, ptPath) && totalPathWeigth(ptGraph, ptPath) <= *bestLength){ 
+	else if(completePath(ptGraph, ptPath) && totalPathWeight(ptGraph, ptPath) <= *bestLength){ 
 		copyArray(ptBestPath, ptPath);
-		*bestLength = totalPathWeigth(ptGraph, ptBestPath);
+		*bestLength = totalPathWeight(ptGraph, ptBestPath);
 		return;
 	}
 
 	//path doesn t contain a vertex, add it
 	else{
 		int i;
-		for(i=0; i< ptGraph->numVertex; i++){
-			if(!pathContains(ptPath, i)){
-				addPath(ptPath, i);
+		struct edge* ptEdge = (ptGraph->vertexList)[(ptPath->elements)[ptPath->usedLength-1]].edgeList; //The vertex always to analyze will be the last
+
+		for( ; ptEdge != NULL; ptEdge = ptEdge->next){
+			if(!pathContains(ptPath, ptEdge->access)){
+				addPath(ptPath, ptEdge->access);
 				tsp_backtracking(ptGraph, ptPath, ptBestPath, bestLength);
-				removePath(ptPath, i, ptGraph->numVertex); 
+				removePath(ptPath, ptEdge->access , ptGraph->numVertex); 
 			}
 		}
-	}
-}
-
-
-//------------------------- Debug -------------------------//
-void printGraph(struct graph* ptGraph){
-	int i;
-	struct edge* tmp;
-
-	for(i=0; i<ptGraph->numVertex; i++){
-		tmp = (ptGraph->vertexList)[i].edgeList;
-		printf("vertex: %d",(ptGraph->vertexList)[i].element);
-		printf("  -->");
-		while(tmp){
-			printf(" %d",tmp->accsses);
-			tmp = tmp->next;
-		}
-		printf("\n\n");
 	}
 }
