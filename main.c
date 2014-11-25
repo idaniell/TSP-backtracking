@@ -43,8 +43,14 @@ struct graph* buildGraph(){
 }
 
 int main(int argc, char** argv){
+	int bestLength = 999999;
 	graph* ptGraph = buildGraph();
+	path* ptPath = createPath(getSize(ptGraph));
+	path* ptBestPath = createPath(getSize(ptGraph));
 
+	tsp_backtracking(ptGraph, ptPath, ptBestPath, &bestLength);
+	printPath(ptBestPath);
+	
 	printGraph(ptGraph);
 	emptyMemory(ptGraph);
 	return 0;
