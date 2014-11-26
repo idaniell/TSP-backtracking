@@ -18,7 +18,6 @@ struct graph{
 	int numVertex;
 };
 
-
 struct path{
 	int* elements;
 	int usedLength;
