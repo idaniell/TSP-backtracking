@@ -31,10 +31,9 @@ Compile \*.c files and run the algorithm with:
 `<origin city> <destination city> <weight of the edge>`
 
 For example, a valid input:
+
 `4`
-
 `5`
-
 `0 1 10`
 
 `0 3 8`
