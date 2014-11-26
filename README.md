@@ -23,17 +23,17 @@ Compile \*.c files and run the algorithm with:
 
 ##Input format
 
-> \&lt;number of vertices\&gt;
-> \&lt;number of edges&gt;
-> \&lt;origin city&gt; &lt;destination city&gt; &lt;weight of the edge&gt;
+`<number of vertices>
+<number of edges>
+<origin city> <destination city> <weight of the edge>`
 
 For example, a valid input:
-> 4
-> 5
-> 0 1 10
-> 0 3 8
-> 0 2 8
-> 1 2 5
-> 2 3 4
+`4
+5
+0 1 10
+0 3 8
+0 2 8
+1 2 5
+2 3 4`
 
 
